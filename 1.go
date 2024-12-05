@@ -11,12 +11,16 @@ import (
 )
 
 func Create2SortedSlices() ([]int, []int) {
+	// Opens file containing the two columns
 	f, err := os.Open("1.txt")
     if err != nil {
         fmt.Println(err)}
 	r := bufio.NewReader(f)
+	// a is a list that contains all the ints on the left
 	a := []int{}
+	// b is a list that contains all the ints on the right
 	b := []int{}
+	// For each line, remove the linebreak character, splits the line by the triple space marker, and adds the two numbers to their respective slice
 	for {
 	    line, err := r.ReadString('\n')
 	    if err != nil {
@@ -31,6 +35,7 @@ func Create2SortedSlices() ([]int, []int) {
 		
 	}
 	defer f.Close()
+	// Sort the two slices
 	sort.Ints(a)
 	sort.Ints(b)
 	return a,b
@@ -53,14 +58,32 @@ func AbsDifference(a, b []int) (int, error) {
 	return sum, nil
 }
 
+func CalculateSimilarity(a []int, b []int) int {
+	// Create a map to count occurrences of numbers in the right list
+	bCounts := make(map[int]int)
+	for _, num := range b {
+		bCounts[num]++
+	}
+
+	// Calculate the similarity score
+	similarityScore := 0
+	for _, num := range a {
+		similarityScore += num * bCounts[num]
+	}
+
+	return similarityScore
+}
+
 
 func main() {
 	a,b:=Create2SortedSlices()
-
-	sum, err := AbsDifference(a, b)
+	//sum1 is the result for the first part of day 1
+	sum1, err := AbsDifference(a, b)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
-	fmt.Println(sum)
+	//sum2 is the result for the second part of day 2
+	sum2:= CalculateSimilarity(a,b)
+	fmt.Println(sum1, sum2)
 }
