@@ -10,17 +10,18 @@ import (
 	"time"
 )
 
-func FindSafeReportsFromFile() int {
+func FindSafeReportsFromFile() (int, int) {
 	// Open the file containing the reports
 	f, err := os.Open("2.txt")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
-		return 0
+		return 0, 0
 	}
 	defer f.Close()
 
-	// Initialize safe report count
+	// Initialize safe report counts
 	safeCount := 0
+	safeCount2 := 0
 
 	// Read file line by line
 	scanner := bufio.NewScanner(f)
@@ -39,10 +40,15 @@ func FindSafeReportsFromFile() int {
 			numbers = append(numbers, num)
 		}
 
-		// Check if the report is safe
+		// Check if the report is safe with the first set of requirements
 		isSafe:=isSafeReport(numbers)
 		if isSafe {
 			safeCount++
+		}
+		
+		// Check if the report is safe with the second set of requirements
+		if isSafe || isKindaSafeReport(numbers) {
+			safeCount2++
 		}
 	}
 
@@ -51,7 +57,7 @@ func FindSafeReportsFromFile() int {
 		fmt.Println("Error reading file:", err)
 	}
 
-	return safeCount
+	return safeCount, safeCount2
 }
 
 // Check if a report is safe based on the given rules
@@ -77,11 +83,24 @@ func isSafeReport(numbers []int) bool {
 	return (isIncreasing && !isDecreasing) || (!isIncreasing && isDecreasing)
 }
 
+func isKindaSafeReport(numbers []int) bool {
+	// Try removing each level one at a time and check if the result is safe
+	for i := 0; i < len(numbers); i++ {
+		newNumbers := append([]int{}, numbers[:i]...)  // Append the numbers before index i to an empty slice
+		newNumbers = append(newNumbers, numbers[i+1:]...)  // Append the part after index i to the slice above
+		if isSafeReport(newNumbers) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func main() {
 	startTime := time.Now()
-	
-	safeReports := FindSafeReportsFromFile()
-	fmt.Printf("Total safe reports: %d\n", safeReports)
+
+	safeReports, safeReports2 := FindSafeReportsFromFile()
+	fmt.Printf("Total safe reports: %d, including the kinda safe: %d\n", safeReports, safeReports2)
 
 	elapsedTime := time.Since(startTime)
 	fmt.Printf("Execution time: %s\n", elapsedTime)
