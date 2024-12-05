@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func Create2SortedSlices() ([]int, []int) {
@@ -75,7 +76,9 @@ func CalculateSimilarity(a []int, b []int) int {
 }
 
 
-func main() {
+func main1() {
+	startTime := time.Now()
+
 	a,b:=Create2SortedSlices()
 	//sum1 is the result for the first part of day 1
 	sum1, err := AbsDifference(a, b)
@@ -86,4 +89,7 @@ func main() {
 	//sum2 is the result for the second part of day 2
 	sum2:= CalculateSimilarity(a,b)
 	fmt.Println(sum1, sum2)
+
+	elapsedTime := time.Since(startTime)
+	fmt.Printf("Execution time: %s\n", elapsedTime)
 }
